@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load heroicons %}
+
+{% block title %}Submit CAB Request{% endblock %}
+
+{% block sidebar %}
+<nav class="flex flex-col h-full bg-gray-50 w-64 p-4">
+    <div class="mb-8 rounded-xl shadow bg-white p-4 text-center">
+        <h2 class="text-xl font-bold text-gray-800">Technician Panel</h2>
+        <p class="text-gray-500 text-sm">L2 Portal</p>
+    </div>
+    <ul class="flex-1 space-y-2">
+        <li>
+            <a href="{% url 'escalated_tickets' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "rocket-launch" %} Escalated Tickets
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'l2_technician_dashboard' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "check-badge" %} Resolved Tickets
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'technician_requests' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "document-plus" %} CAB Requests
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'technician_requestslist' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "ticket" %} Existing Requests
+            </a>
+        </li>
+    </ul>
+    <div class="mt-auto">
+        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-white hover:bg-red-600 transition">
+            {% heroicon_outline "arrow-left-start-on-rectangle" %} Logout
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <div class="max-w-4xl bg-white rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Submit CAB Request</h2>
+
+        <form method="post" action="{% url 'technician_requests' %}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% csrf_token %}
+
+            <!-- Left Column -->
+            <div class="space-y-4">
+                <!-- Title -->
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        {% heroicon_outline "pencil-square" class="w-5 h-5" %}
+                    </span>
+                    <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" placeholder="Title" required
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600"
+                           {% if form.title.value %}value="{{ form.title.value }}"{% endif %} />
+                </div>
+
+                <!-- Description -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        {% heroicon_outline "chat-bubble-left-right" class="w-5 h-5" %}
+                    </span>
+                    <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" placeholder="Description" required
+                              class="w-full pl-10 pr-4 pt-3 pb-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        {% heroicon_outline "exclamation-triangle" class="w-5 h-5" %}
+                    </span>
+                    <textarea name="{{ form.risk_assessment.name }}" id="{{ form.risk_assessment.id_for_label }}" placeholder="Risk Assessment" required
+                              class="w-full pl-10 pr-4 pt-3 pb-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">{% if form.risk_assessment.value %}{{ form.risk_assessment.value }}{% endif %}</textarea>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-4">
+                <!-- Change Type -->
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        {% heroicon_outline "tag" class="w-5 h-5" %}
+                    </span>
+                    <select name="{{ form.change_type.name }}" id="{{ form.change_type.id_for_label }}" required
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">
+                        <option value="" disabled {% if not form.change_type.value %}selected{% endif %}>Select Change Type</option>
+                        {% for value, label in form.change_type.field.choices %}
+                            <option value="{{ value }}" {% if form.change_type.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Implementation Plan -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        {% heroicon_outline "clipboard-document-check" class="w-5 h-5" %}
+                    </span>
+                    <textarea name="{{ form.implementation_plan.name }}" id="{{ form.implementation_plan.id_for_label }}" placeholder="Implementation Plan" required
+                              class="w-full pl-10 pr-4 pt-3 pb-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">{% if form.implementation_plan.value %}{{ form.implementation_plan.value }}{% endif %}</textarea>
+                </div>
+
+                <!-- Rollback Plan -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        {% heroicon_outline "arrow-uturn-left" class="w-5 h-5" %}
+                    </span>
+                    <textarea name="{{ form.rollback_plan.name }}" id="{{ form.rollback_plan.id_for_label }}" placeholder="Rollback Plan" required
+                              class="w-full pl-10 pr-4 pt-3 pb-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">{% if form.rollback_plan.value %}{{ form.rollback_plan.value }}{% endif %}</textarea>
+                </div>
+            </div>
+
+            <!-- Attachment -->
+            <div class="relative md:col-span-2">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    {% heroicon_outline "paper-clip" class="w-5 h-5" %}
+                </span>
+                <input type="file" name="{{ form.attachment.name }}" id="{{ form.attachment.id_for_label }}"
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600" />
+            </div>
+
+            <!-- Submit Button -->
+            <div class="md:col-span-2">
+                    <button type="submit" class="bg-gray-700 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-md transition">Submit Request</button>
+
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

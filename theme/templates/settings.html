@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load heroicons %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block sidebar %}
+<div class="w-64 bg-gray-50 min-h-screen p-4 flex flex-col">
+    <!-- Panel Header -->
+    <div class="mb-6 rounded-lg shadow-md bg-white p-4">
+        <h2 class="text-xl font-bold text-gray-800">User Portal</h2>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="space-y-1 flex-1">
+        <ul class="dashboard-menu">
+            <li>
+                <a href="{% url 'add_ticket' %}"
+                   class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {% if request.path == '/admin/dashboard/' %}bg-gray-200 font-semibold{% endif %}">
+                    {% heroicon_outline "folder-plus" class="w-5 h-5" %}
+                    Add Ticket
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'dashboard' %}"
+                   class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {% if request.path == '/dashboard/' %}bg-gray-200 font-semibold{% endif %}">
+                    {% heroicon_outline "ticket" class="w-5 h-5" %}
+                    My Tickets
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'settings-page' %}"
+                   class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {% if request.path == '/settings/' %}bg-gray-200 font-semibold{% endif %}">
+                    {% heroicon_outline "cog-8-tooth" class="w-5 h-5" %}
+                    Settings
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Logout Anchored at Bottom -->
+    <div class="mt-auto">
+        <a href="{% url 'logout' %}"
+           class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg font-bold">
+            {% heroicon_outline "arrow-left-on-rectangle" class="w-5 h-5" %}
+            Logout
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-20 px-4">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Update Your Details</h2>
+        
+        <form method="POST" action="{% url 'settings-page' %}" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <button 
+                type="submit" 
+                class="w-full bg-gray-700 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded transition">
+                Update Settings
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+

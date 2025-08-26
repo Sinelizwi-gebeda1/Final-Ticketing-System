@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load heroicons %}
+{% load static %}
+
+{% block top_button %}
+<button class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+    Escalated Tickets <span class="bg-white text-blue-600 text-xs px-2 py-1 rounded-full">{{ total_l2_tickets }}</span>
+</button>
+{% endblock %}
+
+{% block sidebar %}
+<nav class="flex flex-col h-full bg-gray-50 w-64 p-4">
+    <div class="mb-8 rounded-xl shadow bg-white p-4 text-center">
+        <h2 class="text-xl font-bold text-gray-800">Technician Panel</h2>
+        <p class="text-gray-500 text-sm">L2 Portal</p>
+    </div>
+    <ul class="flex-1 space-y-2">
+        <li>
+            <a href="{% url 'escalated_tickets' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "rocket-launch" %} Escalated Tickets
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'l2_technician_dashboard' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "check-badge" %} Resolved Tickets
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'technician_requests' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "document-plus" %} CAB Requests
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'technician_requestslist' %}" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-200">
+                {% heroicon_outline "ticket" %} Existing Requests
+            </a>
+        </li>
+    </ul>
+    <div class="mt-auto">
+        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-white hover:bg-red-600 transition">
+            {% heroicon_outline "arrow-left-start-on-rectangle" %} Logout
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <!-- Search bar -->
+    <div class="flex justify-center mb-6">
+        <div class="relative w-full">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                {% heroicon_outline "magnifying-glass" class="w-5 h-5" %}
+            </span>
+            <input id="ticket-search" type="text" placeholder="Search by title or ticket number..."
+                class="w-full pl-10 pr-4 py-2 rounded-lg text-gray-900 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+    </div>
+
+ <hr>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-6 mb-6 items-center">
+        <div class="flex gap-2 items-center">
+            <span class="font-semibold text-gray-700 mr-2">Priority:</span>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-[#000040] text-white hover:bg-gray-200 flex items-center gap-1" data-filter="priority" data-value="High">
+                {% heroicon_outline "exclamation-circle" class="w-4 h-4 text-red-500" %} High
+            </button>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-[#000040] text-white hover:bg-gray-200 flex items-center gap-1" data-filter="priority" data-value="Medium">
+                {% heroicon_outline "exclamation-circle" class="w-4 h-4 text-yellow-500" %} Medium
+            </button>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-[#000040] text-white hover:bg-gray-200 flex items-center gap-1" data-filter="priority" data-value="Low">
+                {% heroicon_outline "check-circle" class="w-4 h-4 text-green-500" %} Low
+            </button>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <span class="font-semibold text-gray-700 mr-2">Department:</span>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-gray-900 text-gray-100 hover:bg-gray-200 flex items-center gap-1" data-filter="department" data-value="IT">
+                {% heroicon_outline "cpu-chip" class="w-4 h-4 text-blue-500" %} IT
+            </button>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-gray-900 text-gray-100 hover:bg-gray-200 flex items-center gap-1" data-filter="department" data-value="HR">
+                {% heroicon_outline "users" class="w-4 h-4 text-purple-500" %} HR
+            </button>
+            <button class="filter-btn px-3 py-2 rounded-lg bg-gray-900 text-gray-100 hover:bg-gray-200 flex items-center gap-1" data-filter="department" data-value="Finance">
+                {% heroicon_outline "banknotes" class="w-4 h-4 text-green-500" %} Finance
+            </button>
+        </div>
+    </div>
+
+    {% if escalated_tickets %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+        {% for ticket in escalated_tickets %}
+        <div class="ticket-card bg-white border border-gray-200 shadow-md rounded-2xl overflow-hidden transition transform hover:scale-[1.02] hover:shadow-lg"
+             data-title="{{ ticket.ticket_title|lower }}"
+             data-number="{{ ticket.ticket_number|lower }}"
+             data-priority="{{ ticket.priority_level }}"
+             data-department="{{ ticket.department }}">
+            <div class="flex justify-between items-center p-4 border-b bg-gray-50">
+                <div>
+                    <h5 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        {% heroicon_outline "rocket-launch" class="w-5 h-5 text-orange-500" %}
+                        {{ ticket.ticket_title }}
+                    </h5>
+                    <p class="text-xs text-gray-500">#{{ ticket.ticket_number }}</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold tracking-wide
+                  {% if ticket.priority_level == 'High' %} bg-red-100 text-red-700 
+                  {% elif ticket.priority_level == 'Medium' %} bg-yellow-100 text-yellow-700 
+                  {% else %} bg-green-100 text-green-700 {% endif %}">
+                  {{ ticket.priority_level }}
+                </span>
+            </div>
+
+            <div class="p-4 space-y-3">
+                <p class="text-gray-700">
+                    <span class="font-medium">Description:</span> 
+                    <span class="text-gray-600">{{ ticket.problem_description|truncatechars:120 }}</span>
+                </p>
+                <p class="text-sm text-gray-500"><strong>Status:</strong> {{ ticket.status }}</p>
+                <p class="text-sm text-gray-500"><strong>Date:</strong> {{ ticket.date_created_on|date:"M d, Y - H:i" }}</p>
+                
+
+
+                <!--Actions-->
+                <div class="flex flex-wrap gap-2 pt-2">
+                    {% if not ticket.accepted_by_l2 %}
+                        <form method="post" action="{% url 'accept_ticket_l2_escalated' ticket.id %}" class="w-full">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                Accept
+                            </button>
+                        </form>
+                    {% else %}
+                        <button onclick="openModal('modal-{{ ticket.id }}')" 
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
+                            View
+                        </button>
+                        <a href="mailto:{{ ticket.user.email }}?subject=More info on ticket {{ ticket.ticket_number }}" class="px-4 py-2 bg-yellow-50 text-yellow-700 rounded-lg text-sm hover:bg-yellow-100">
+                            Request Info
+                        </a>
+                        <form method="post" action="{% url 'close_ticket_escalated' ticket.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm hover:bg-green-100">Close</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div id="modal-{{ ticket.id }}" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative max-h-[80vh] overflow-y-auto">
+                <button onclick="closeModal('modal-{{ ticket.id }}')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Ticket Details</h2>
+                <div class="space-y-2 text-sm text-gray-700">
+                    <p><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</p>
+                    <p><strong>Title:</strong> {{ ticket.ticket_title }}</p>
+                    <p><strong>Description:</strong> {{ ticket.problem_description }}</p>
+                    <p><strong>Department:</strong> {{ ticket.department }}</p>
+                    <p><strong>Priority:</strong>
+                        <span class="
+                            px-2 py-1 rounded-full text-white text-xs font-medium
+                            {% if ticket.priority_level == 'High' %} bg-red-600
+                            {% elif ticket.priority_level == 'Medium' %} bg-yellow-500
+                            {% else %} bg-green-600 {% endif %}
+                        ">
+                            {{ ticket.priority_level }}
+                        </span>
+                    </p>
+
+                    <p><strong>Status:</strong> {{ ticket.status }}</p>
+                     <p><strong>Date Created:</strong> {{ ticket.date_created_on|date:"M d, Y - H:i" }}</p>
+                    <p><strong>User Email:</strong> {{ ticket.user.email }}</p>
+                     {% if ticket.attachment %}
+                        <p><strong>Attachment:</strong></p>
+                        {% if ticket.attachment.url|lower|slice:'-4:' == '.jpg' or ticket.attachment.url|lower|slice:'-4:' == '.png' or ticket.attachment.url|lower|slice:'-5:' == '.jpeg' %}
+                            <img src="{{ ticket.attachment.url }}" alt="Attachment" class="img-fluid">
+                        {% else %}
+                            <p><a href="{{ ticket.attachment.url }}" class="btn btn-outline-primary" target="_blank">Download Attachment</a></p>
+                        {% endif %}
+                    {% endif %}
+                     <hr>
+                <h6>Escalation Notes:</h6>
+                {% if ticket.escalation_notes.all %}
+                    <ul class="list-group">
+                        {% for note in ticket.escalation_notes.all %}
+                            <li class="list-group-item">
+                                <p><strong>From L1 Technician: {{ note.created_by.email }}</strong></p>
+                                <p>{{ note.note|linebreaks }}</p>
+                                <small class="text-muted">{{ note.created_at|date:"M d, Y - H:i" }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p><em>No notes were added during escalation.</em></p>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-gray-500 text-lg mt-6">No escalated tickets assigned to you.</p>
+    {% endif %}
+</div>
+
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

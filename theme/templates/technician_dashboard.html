@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load heroicons %}
+
+{% block sidebar %}
+<nav class="flex flex-col h-full bg-gray-50 w-64 p-4">
+    <div class="mb-8 rounded-xl shadow bg-white p-4 text-center">
+        <h2 class="text-xl font-bold text-gray-800">Technician Panel</h2>
+        <p class="text-gray-500 text-sm">L1 Portal</p>
+    </div>
+    <ul class="flex-1 space-y-2">
+        <li>
+            <a href="{% url 'technician_dashboard' %}" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 font-semibold">
+                {% heroicon_outline "clipboard" class="w-5 h-5" %} Dashboard
+            </a>
+        </li>
+         <li>
+            <a href="{% url 'l1_technicians_tickets' %}"  class="flex items-center gap-3 text-gray-700 hover:text-blue-600 font-semibold">
+                {% heroicon_outline "ticket" class="w-5 h-5" %} My Tickets
+            </a>
+        </li>
+       
+    </ul>
+    <div class="mt-auto">
+        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-white hover:bg-red-600 transition">
+            {% heroicon_outline "arrow-left-start-on-rectangle" %} Logout
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 mt-10">
+    <!-- My Tickets -->
+    <div class="bg-gray-700 border border-gray-300 rounded-xl p-8 flex items-center justify-between shadow hover:shadow-md transition">
+        <div class="flex items-center gap-3 text-white font-semibold">
+            {% heroicon_outline "ticket" %}
+            <span>My Tickets</span>
+        </div>
+        <span class="bg-cyan-900 text-white px-3 py-1 rounded-full text-sm">{{ my_tickets_count }}</span>
+    </div>
+
+    <!-- Pending Tickets -->
+    <div class="bg-gray-700 border border-blue-gray-300 rounded-xl p-8 flex items-center justify-between shadow hover:shadow-md transition">
+        <div class="flex items-center gap-3 text-white font-semibold">
+            {% heroicon_outline "receipt-refund" %}
+            <span>Pending Tickets</span>
+        </div>
+        <span class="bg-cyan-900 text-white px-3 py-1 rounded-full text-sm">{{ pending_tickets_count }}</span>
+    </div>
+</div>
+
+{% endblock %}
